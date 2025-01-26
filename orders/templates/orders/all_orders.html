@@ -1,0 +1,90 @@
+{% extends "orders/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 mb-5 pb-5">
+  <div>
+    {% if messages%}
+      {% for message in messages %}
+        <p style="color:blue"> {{message}} </p>
+      {% endfor%}
+    {% endif %}
+  </div>
+  <div class="container">
+    <div class="table-responsive">
+        <table class="table text-center pb-5">
+          <thead>
+            <tr>
+              <th style="width: 20%;">
+                <div class="dropdown">
+                  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <b>Order ID</b>
+                  </button>
+                  <ul class="dropdown-menu" style="width:10px">
+                    <li>
+                      <form action="all_orders" method="POST" class="col-12 col-lg-auto mb-3 mb-lg-0" role="search">
+                        {% csrf_token %}
+                        <input type="search" name="order_id" type="number" class="form-control" placeholder="Search..." aria-label="Search">
+                      </form>
+                    </li>
+                  </ul>
+                </div>
+              </th>
+              <th style="width: 20%;">
+                <div class="dropdown">
+                  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <b>Table Number</b>
+                  </button>
+                  <ul class="dropdown-menu" style="width:10px">
+                    <li>
+                      <form action="all_orders" method="POST" class="col-12 col-lg-auto mb-3 mb-lg-0" role="search">
+                        {% csrf_token %}
+                        <input type="search" name="table" type="number" class="form-control" placeholder="Search..." aria-label="Search">
+                      </form>
+                    </li>
+                  </ul>
+                </div>
+              </th>
+              <th style="width: 20%;">
+                <button class="btn toggle" type="button" aria-expanded="false">
+                  <b>Items</b>
+                </button>
+              </th>
+              <th style="width: 20%;">
+                <button class="btn toggle" type="button" aria-expanded="false">
+                  <b>Total Price</b>
+                </button>
+              </th>
+              <th style="width: 20%;">
+                <div class="dropdown">
+                  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <b>Status</b>
+                  </button>
+                  <ul class="dropdown-menu" style="width:10px">
+                    <li>
+                      <form action="all_orders" method="POST" class="col-12 col-lg-auto mb-3 mb-lg-0" role="search">
+                        {% csrf_token %}
+                        <input type="search" name="status" class="form-control" placeholder="Search..." aria-label="Search">
+                      </form>
+                    </li>
+                  </ul>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          {% for order in orders %}
+          <tbody>
+            <tr>
+              <th scope="row"><a href="{% url 'order' order.id %}">{{order.id}} </a></th>
+              <td>{{order.table_number}}</td>
+              <td>{{order.items|linebreaks}}</td>
+              <td>{{order.price}}</td>
+              <td>{{order.status}}</td>
+            </tr>
+          </tbody>
+        {% endfor %}
+        </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

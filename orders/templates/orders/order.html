@@ -1,0 +1,94 @@
+{% extends "orders/base.html" %}
+{% load static %}
+{% block content%}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-lg-5">
+      {% if order.status == 'processed' %}
+      <div class="dropdown" data-bs-theme="dark">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="width:390px" aria-expanded="false">
+          Choose Dish from Menu
+        </button>
+        <ul class="dropdown-menu">
+          {% for d in menu %}
+          <li>
+          <a href="{% url 'add_dish' order.id d.id %}" class="dropdown-item btn btn-hover-light rounded-2 d-flex align-items-start gap-2 py-2 px-3 lh-sm text-start">
+            <img src="{{d.image.url}}" class="bi" width="24" height="24">
+            <div>
+              <strong class="d-block">{{d.title}}</strong>
+              <small>{{d.price}} $</small>
+            </div>
+          </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+    <div class="col-lg-7">
+      <div class="col-md-7 col-lg-7 order-md-last">
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-primary"> Order <strong>{{order.id}}</strong> </span>
+          <span class="badge bg-warning rounded-pill"><a href="{% url "delete_order" order.id %}" title="Delete order"><img src="{% static "images/x.svg" %}"></a></span>
+
+        </h4>
+        <ul class="list-group">
+          {% for dish in dishes %}
+            <li class="list-group-item d-flex ">
+              <div class="container">
+                <div class="row">
+                  <div class="col-lg-4">
+                    <h6 class="my-0">{{dish.title}}</h6>
+                  </div>
+                  <div class="col-lg-3">
+                    <span class="text-body-secondary px-3">${{dish.price}}</span>
+                  </div>
+                  {% if order.status == 'processed' %}
+                  <div class="col-lg-3">
+                    <div class="input-group input-group-sm mb-3">
+                      <button type="submit" class="input-group-text" id="inputGroup-sizing-sm"> <a href="{% url 'change' 'reduce' dish.id order.id %}" style="text-decoration: none;">-</a></button>
+                      <input type="text" class="form-control" readonly aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" value={{dish.count}}>
+                      <button type="submit" class="input-group-text" id="inputGroup-sizing-sm"><a href="{% url 'change' 'increase' dish.id order.id %}" style="text-decoration: none;">+</a></button>
+                    </div>
+                  </div>
+                  <div class="col-lg-2">
+                    <button class="btn btn-outline-light" type="submit">
+                      <a href="{% url 'change' 'delete' dish.id order.id %}">
+                        <img src="{% static "images/x-lg.svg" %}"/>
+                      </a>
+                    </button>
+                  </div>
+                  {% else %}
+                  <div class="col-lg-5">
+                    <span>{{dish.count}}</span>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </li>
+            {% endfor %}
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Total (USD)</span>
+              <strong>${{order.price}}</strong>
+            </li>
+            {% if order.status != 'paid'%}
+            <div class="dropdown">
+              <button class="btn btn-outline-info dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <b>Status:</b> {{order.status}}
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'change_status' order.id 'ready' %}">ready</a></li>
+                <li><a class="dropdown-item" href="{% url 'change_status' order.id 'paid' %}">paid</a></li>
+              </ul>
+            </div>
+            {% else %}
+            <button class="btn btn-outline-info" type="button" aria-expanded="false">
+              <b>Status:</b> {{order.status}}
+            </button>
+            {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

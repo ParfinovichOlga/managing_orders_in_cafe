@@ -1,0 +1,61 @@
+{% extends "orders/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis" style="background-color:rgb(243, 237, 179)">
+        <div class="col-lg-6 px-0">
+          <h1 class="display-4 fst-italic">Menu</h1>
+          <p class="lead my-3">Here you can see our breakfast menu</p>
+        </div>
+      </div>
+      <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+              <h2 class="display-5 link-body-emphasis mb-3 mt-5">Hot Drinks</h2>
+              <hr>
+                {% for hot in hots%}
+                <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                    <div class="col p-4 d-flex flex-column position-static">
+                      <h3 class="mb-0">{{hot.title}}</h3>
+                      <p class="card-text mb-auto">${{hot.price}}</p>
+                    </div>
+                    <div class="col-auto d-none d-lg-block">
+                      <img src="{{hot.image.url}}" style="display: inline-block; border-radius: 50%;  overflow: hidden;  width: 100px;  height: 100px;">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-lg-6">
+              <h2 class="display-5 link-body-emphasis mb-3 mt-5">Drinks</h2>
+              <hr>
+                {% for drink in drinks%}
+                <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                    <div class="col p-4 d-flex flex-column position-static">
+                      <h3 class="mb-0">{{drink.title}}</h3>
+                      <p class="card-text mb-auto">${{drink.price}}</p>
+                    </div>
+                    <div class="col-auto d-none d-lg-block">
+                      <img src="{{drink.image.url}}" style="display: inline-block; border-radius: 50%;  overflow: hidden;  width: 100px;  height: 100px;">
+                    </div>
+                </div>
+                {% endfor %}
+                <h2 class="display-5 link-body-emphasis mb-3 mt-5">Breakfast</h2>
+                <hr>
+                {% for dish in breakfasts%}
+                <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                    <div class="col p-4 d-flex flex-column position-static">
+                      <h3 class="mb-0">{{dish.title}}</h3>
+                      <p class="card-text mb-auto">${{dish.price}}</p>
+                    </div>
+                    <div class="col-auto d-none d-lg-block">
+                      <img src="{{dish.image.url}}" style="display: inline-block; border-radius: 50%;  overflow: hidden;  width: 100px;  height: 100px;">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+      </div>
+</div>
+
+{% endblock  %}
