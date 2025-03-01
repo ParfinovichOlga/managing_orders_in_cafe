@@ -6,21 +6,6 @@ from rest_framework import viewsets
 from orders.models import *
 from api_orders import serializers
 
-class OrderViewSet(viewsets.ModelViewSet):
-    """View for manage order APIs."""
-    serializer_class = serializers.OrderDetailSerializer
-    queryset = Order.objects.all()
-
-    def get_queryset(self):
-        """Retrieve orders"""
-        return self.queryset.order_by('-id')
-
-    def get_serializer_class(self):
-        """Return the serializer class for requests."""
-        if self.action == 'list':
-            return serializers.OrderSerializer
-        return self.serializer_class
-
 
 class DishViewSet(viewsets.ModelViewSet):
     """Manage dishes."""
@@ -42,3 +27,15 @@ class MenuViewSet(viewsets.ModelViewSet):
     """Manage menu."""
     serializer_class = serializers.MenuSerializer
     queryset = Menu.objects.all()
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    """Manage order."""
+    serializer_class = serializers.OrderDetailSerializer
+    queryset = Order.objects.all().order_by('-id')
+
+    def get_serializer_class(self):
+        """Return the serializer class for request."""
+        if self.action == 'list':
+            return serializers.OrderSerializer
+        return self.serializer_class
