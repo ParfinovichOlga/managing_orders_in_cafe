@@ -11,7 +11,8 @@ router.register('orders', views.OrderViewSet)
 router.register('dishes', views.DishViewSet)
 router.register('categories', views.CategoryViewSet)
 router.register('menu', views.MenuViewSet)
-app_name = 'order'
+
+app_name = 'ord'
 
 urlpatterns = [
     path('',include(router.urls))
