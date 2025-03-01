@@ -9,12 +9,12 @@ from datetime import datetime
 from django.urls import reverse
 # Create your tests here.
 
-ORDER_URL = reverse('order:order-list')
-DISH_URL = reverse('order:dish-list')
+ORDER_URL = reverse('ord:order-list')
+DISH_URL = reverse('ord:dish-list')
 
 def detail_url(order_id):
     """Create and return a order detail URL."""
-    return reverse('order:order-detail', args=[order_id])
+    return reverse('ord:order-detail', args=[order_id])
 
 
 def create_order(**params):
@@ -33,11 +33,13 @@ def create_order(**params):
 
 class OrderAPITests(TestCase):
     """Test API requests."""
+    def setUp(self):
+        self.client = APIClient()
+
     def test_order_request(self):
         """Test retrieving a list of orders."""
         create_order()
         create_order()
-        self.client = APIClient()
         res = self.client.get(ORDER_URL)
         orders = Order.objects.all().order_by('-id')
         serializer = OrderSerializer(orders, many=True)
@@ -52,6 +54,47 @@ class OrderAPITests(TestCase):
 
         serializer = OrderDetailSerializer(order)
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_dish_on_update(self):
+        """Test creating dish when update an order."""
+        order = create_order()
+        payload = {'dishes': [{'title': 'new_dish', 'price': Decimal('2.5')}]}
+        url = detail_url(order.id)
+
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        new_dish = Dish.objects.get(order_id=order.id, title='new_dish')
+        self.assertIn(new_dish, order.dishes.all())
+
+    def test_update_order_assign_dish(self):
+        """Test assigning an existing tag when updating a recipe."""
+        coffee = Dish.objects.create(title='Coffee', price=Decimal(2.5))
+        order = create_order()
+        order.dishes.add(coffee)
+
+        payload = {'dishes': [{'title': 'Soup', 'price': Decimal('4.0')}]}
+        url = detail_url(order.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertNotIn(coffee, order.dishes.all())
+        self.assertEqual(order.dishes.count(), 1)
+        self.assertEqual('Soup', order.dishes.all()[0].title)
+
+
+    def test_clear_order_dishes(self):
+        """Test clearing an order dishes."""
+        dish = Dish.objects.create(title='Coffee', price=Decimal('2'))
+        order = create_order()
+        order.dishes.add(dish)
+
+        payload = {'dishes': []}
+        url = detail_url(order.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(order.dishes.count(), 0)
 
 
 class DishAPITtests(TestCase):
