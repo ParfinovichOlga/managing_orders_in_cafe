@@ -21,7 +21,6 @@ def create_order(**params):
     """Create and return a sample order."""
     defaults = {
         'table_number': random.randint(1,10),
-        'order_date': datetime.now(),
         'price': Decimal(2.5),
         'status': 'processed',
         'items': 'A few items'
@@ -95,6 +94,48 @@ class OrderAPITests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(order.dishes.count(), 0)
+
+    def test_filter_by_table(self):
+        """Test filtering orders by table number."""
+        ord1 = create_order(table_number=1)
+        create_order(table_number=1)
+        ord3 = create_order(table_number=2)
+
+        params = {'table_id': {ord1.table_number}}
+        res = self.client.get(ORDER_URL, params)
+        orders = Order.objects.filter(table_number=ord1.table_number)
+
+        self.assertIn(OrderSerializer(ord1).data,
+                         res.data)
+        self.assertNotIn(OrderSerializer(ord3), res.data)
+        self.assertEqual(orders.count(), 2)
+
+    def test_filter_by_order_id(self):
+        """Test filtering orders by order id."""
+        create_order()
+        create_order()
+        ord = create_order()
+
+        params = {'id': {ord.id}}
+        res = self.client.get(ORDER_URL, params)
+        s = OrderSerializer(ord, many=False)
+
+        self.assertEqual(res.data[0], s.data)
+
+    def test_filter_by_order_status(self):
+        """Test filtering orders by status."""
+        paid_order = create_order(status='paid')
+        create_order(status='paid')
+        proceed_order = create_order()
+
+        params = {'status': 'paid'}
+        res = self.client.get(ORDER_URL, params)
+        paid = Order.objects.filter(status='paid')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
+        self.assertIn(OrderSerializer(paid_order).data, res.data)
+        self.assertNotIn(OrderSerializer(proceed_order).data, res.data)
 
 
 class DishAPITtests(TestCase):
